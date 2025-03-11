@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIGSTICK - Configuration-Interaction Shell-Model Code</title>
+    <title>BIGSTICK Input Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,53 +32,20 @@
             margin-bottom: 20px;
             border-radius: 5px 5px 0 0;
         }
-        .workflow-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .workflow-step {
-            flex: 1;
-            min-width: 150px;
-            margin: 0 10px 20px 10px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            text-align: center;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .workflow-step:hover {
-            background-color: #edf7ff;
-            border-color: #3498db;
-        }
-        .workflow-step.active {
-            background-color: #d4eeff;
-            border-color: #3498db;
-            font-weight: bold;
-        }
-        .workflow-step-number {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 50%;
-            line-height: 30px;
-            margin-bottom: 10px;
-        }
-        .section {
-            display: none;
-            margin: 20px 0;
-            padding: 20px;
+        .card {
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: white;
         }
-        .section.active {
-            display: block;
+        .card-header {
+            background-color: #f3f3f3;
+            padding: 10px 15px;
+            margin: -15px -15px 15px -15px;
+            border-bottom: 1px solid #ddd;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
         }
         .form-group {
             margin-bottom: 20px;
@@ -109,19 +76,32 @@
         button:hover {
             background-color: #2980b9;
         }
+        button.generate-btn {
+            background-color: #27ae60;
+            font-size: 18px;
+            padding: 12px 24px;
+            margin: 20px 0;
+            display: block;
+            width: 100%;
+        }
+        button.generate-btn:hover {
+            background-color: #219653;
+        }
         .help-text {
             font-size: 14px;
             color: #666;
             margin-top: 5px;
         }
-        .navigation {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
         .info-box {
             background-color: #edf7ff;
             border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        .example-box {
+            background-color: #f0f7f0;
+            border-left: 4px solid #27ae60;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 5px 5px 0;
@@ -145,23 +125,16 @@
         .checkbox-group input[type="checkbox"] {
             margin-right: 10px;
         }
-        .file-upload {
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
+        .code-block {
+            background-color: #f4f4f4;
             border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .tooltip {
             position: relative;
@@ -190,269 +163,145 @@
             visibility: visible;
             opacity: 1;
         }
-        .tabs {
-            overflow: hidden;
-            border: 1px solid #ccc;
-            background-color: #f1f1f1;
-            border-radius: 5px 5px 0 0;
-        }
-        .tabs button {
-            background-color: inherit;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-            font-size: 16px;
-            color: #333;
-        }
-        .tabs button:hover {
-            background-color: #ddd;
-        }
-        .tabs button.active {
-            background-color: #3498db;
-            color: white;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 5px 5px;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .loading {
-            display: none;
-            text-align: center;
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
             margin: 20px 0;
         }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto;
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .code-block {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            margin-bottom: 20px;
-        }
-        .nav-pills {
+        .tab-navigation {
             display: flex;
-            list-style: none;
-            padding: 0;
+            overflow-x: auto;
             margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
         }
-        .nav-pills li {
-            margin-right: 5px;
-        }
-        .nav-pills li a {
-            text-decoration: none;
-            padding: 10px 15px;
+        .tab-button {
+            padding: 10px 20px;
             background-color: #f3f3f3;
-            color: #333;
-            border-radius: 5px;
-            display: block;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
         }
-        .nav-pills li a.active {
-            background-color: #3498db;
-            color: white;
-        }
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .tab-button.active {
+            border-bottom: 3px solid #3498db;
             background-color: white;
         }
-        .card-header {
-            background-color: #f3f3f3;
-            padding: 10px 15px;
-            margin: -15px -15px 15px -15px;
-            border-bottom: 1px solid #ddd;
-            border-radius: 5px 5px 0 0;
-            font-weight: bold;
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+        }
+        .input-preview {
+            border: 2px solid #27ae60;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #f9fffc;
+            margin-top: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .action-buttons button, .action-buttons a {
+            margin: 0 10px;
+            padding: 10px 20px;
+            width: auto;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>BIGSTICK</h1>
-        <p>Configuration-Interaction Shell-Model Code for Many-Fermion Systems</p>
+        <h1>BIGSTICK Input Generator</h1>
+        <p>Create input files for BIGSTICK nuclear shell-model calculations</p>
     </header>
 
     <div class="container">
         <div class="info-box">
-            <h3>Welcome to BIGSTICK Web Interface</h3>
-            <p>This interface provides a beginner-friendly way to use the BIGSTICK shell-model code. BIGSTICK is a flexible configuration-interaction code that solves for low-lying eigenvalues of the Hamiltonian of many-fermion systems.</p>
-            <p>If you're new to BIGSTICK, this interface will guide you through each step of setting up and running a calculation. Follow the workflow from left to right.</p>
+            <h3>Welcome to the BIGSTICK Input Generator</h3>
+            <p>This web interface helps you create input files for BIGSTICK, a configuration-interaction shell-model code for nuclear physics calculations. Even if you've never used BIGSTICK before, this tool will guide you through the process step by step.</p>
+            <p>Follow the tabs below to set up your calculation parameters, then generate an input file that you can download and use with BIGSTICK.</p>
         </div>
 
-        <div class="workflow-container">
-            <div class="workflow-step active" data-section="introduction">
-                <span class="workflow-step-number">1</span>
-                <div>Introduction</div>
-            </div>
-            <div class="workflow-step" data-section="prerequisites">
-                <span class="workflow-step-number">2</span>
-                <div>Prerequisites</div>
-            </div>
-            <div class="workflow-step" data-section="model-space">
-                <span class="workflow-step-number">3</span>
-                <div>Define Model Space</div>
-            </div>
-            <div class="workflow-step" data-section="interaction">
-                <span class="workflow-step-number">4</span>
-                <div>Set Interactions</div>
-            </div>
-            <div class="workflow-step" data-section="run-options">
-                <span class="workflow-step-number">5</span>
-                <div>Run Options</div>
-            </div>
-            <div class="workflow-step" data-section="diagonalization">
-                <span class="workflow-step-number">6</span>
-                <div>Diagonalization</div>
-            </div>
-            <div class="workflow-step" data-section="results">
-                <span class="workflow-step-number">7</span>
-                <div>Results</div>
-            </div>
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="introduction">Introduction</button>
+            <button class="tab-button" data-tab="model-space">Model Space</button>
+            <button class="tab-button" data-tab="interactions">Interactions</button>
+            <button class="tab-button" data-tab="run-options">Run Options</button>
+            <button class="tab-button" data-tab="diagonalization">Diagonalization</button>
+            <button class="tab-button" data-tab="input-file">Input File</button>
         </div>
 
-        <!-- Introduction Section -->
-        <div id="introduction" class="section active">
+        <!-- Introduction Tab -->
+        <div id="introduction" class="tab-section active">
             <h2>Introduction to BIGSTICK</h2>
-            <p>BIGSTICK is a configuration-interaction many-fermion code, written in Fortran 90. It solves for low-lying eigenvalues of the Hamiltonian of a many-fermion system. The Hamiltonian is assumed to be rotationally invariant and to conserve parity, and is limited to two-body (and optionally three-body) forces.</p>
             
-            <div class="info-box">
-                <h3>Key Features</h3>
+            <div class="card">
+                <div class="card-header">What is BIGSTICK?</div>
+                <p>BIGSTICK is a configuration-interaction (CI) shell-model code for nuclear physics calculations. It solves the many-body Schrödinger equation for atomic nuclei, calculating properties such as energy levels, electromagnetic transitions, and other observables.</p>
+                
+                <p>Some key capabilities of BIGSTICK include:</p>
                 <ul>
-                    <li>Compute ground state energies and low-lying excitation spectra</li>
-                    <li>Calculate angular momentum and isospin</li>
-                    <li>Generate wave functions</li>
-                    <li>Compute one-body densities and transition densities</li>
-                    <li>Calculate expectation values of scalar operators</li>
-                    <li>Compute transition probability distributions</li>
-                    <li>Support for both "no-core" systems and phenomenological valence systems</li>
+                    <li>Compute low-lying energy spectra of nuclei</li>
+                    <li>Calculate angular momentum and isospin quantum numbers</li>
+                    <li>Generate nuclear wave functions</li>
+                    <li>Compute one-body densities and transition strengths</li>
+                    <li>Support for both "conventional" shell model (with a core) and "no-core" shell model calculations</li>
                 </ul>
             </div>
-
+            
             <div class="card">
-                <div class="card-header">Citation Information</div>
-                <p>If you use BIGSTICK in your research, please cite:</p>
-                <ul>
-                    <li>C. W. Johnson, W. E. Ormand, and P. G. Krastev, Comp. Phys. Comm. 184, 2761-2774 (2013)</li>
-                    <li>C. W. Johnson, W. E. Ormand, K. S. McElvain, and H. Z. Shan, UCRL number LLNL-SM-739926</li>
-                </ul>
-                <p>BIGSTICK is distributed under the MIT Open Source License.</p>
-            </div>
-
-            <div class="navigation">
-                <div></div>
-                <button class="next-btn" data-next="prerequisites">Next: Prerequisites</button>
-            </div>
-        </div>
-
-        <!-- Prerequisites Section -->
-        <div id="prerequisites" class="section">
-            <h2>Prerequisites</h2>
-            <p>Before using BIGSTICK, you need to have the following prerequisites in place:</p>
-
-            <div class="card">
-                <div class="card-header">Required Files</div>
-                <p>BIGSTICK requires at least two kinds of input files to run:</p>
+                <div class="card-header">How to Use This Generator</div>
+                <p>This web tool helps you create input files for BIGSTICK without needing to understand all the technical details. Just follow these steps:</p>
                 <ol>
-                    <li><strong>Single-particle space description</strong> (.sps file): Defines the orbitals and quantum numbers</li>
-                    <li><strong>Interaction matrix elements</strong> (.int file): Contains the matrix elements of the interaction</li>
+                    <li><strong>Navigate through the tabs</strong> at the top to fill in required parameters</li>
+                    <li><strong>Fill out the form fields</strong> in each section (default values are provided for beginners)</li>
+                    <li><strong>Generate your input file</strong> in the final tab</li>
+                    <li><strong>Download the input file</strong> to use with BIGSTICK</li>
                 </ol>
-                <p>While sample input files are included with BIGSTICK, users typically need to provide their own interaction files for specific calculations.</p>
+                <p>The input generator will create a text file that can be used with the command:</p>
+                <code>bigstick.x < your_input_file.txt</code>
             </div>
-
-            <div class="card">
-                <div class="card-header">Checking Available Files</div>
-                <p>This interface allows you to use existing .sps and .int files. Check what files are available:</p>
-                <div class="form-group">
-                    <label for="spsFiles">Available .sps files:</label>
-                    <select id="spsFiles">
-                        <option value="">-- Select an option --</option>
-                        <option value="sd">sd.sps (sd shell)</option>
-                        <option value="pf">pf.sps (pf shell)</option>
-                        <option value="fpd">fpd.sps (fp+d5/2 shell)</option>
-                        <option value="sdpf">sdpf.sps (sd+pf shell)</option>
-                        <option value="auto">Auto-generate (for no-core shell model)</option>
-                    </select>
-                    <p class="help-text">This selection shows some common single-particle space files. For real calculations, you need to ensure you have the appropriate .sps file.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="intFiles">Available .int files:</label>
-                    <select id="intFiles">
-                        <option value="">-- Select an option --</option>
-                        <option value="usda">usda.int (USDA interaction for sd shell)</option>
-                        <option value="usdb">usdb.int (USDB interaction for sd shell)</option>
-                        <option value="gx1a">gx1a.int (GX1A interaction for pf shell)</option>
-                        <option value="kb3g">kb3g.int (KB3G interaction for pf shell)</option>
-                    </select>
-                    <p class="help-text">This selection shows some common interaction files. For real calculations, you need to ensure you have the appropriate .int file that matches your .sps file.</p>
-                </div>
+            
+            <div class="example-box">
+                <h3>Example: 24Mg Calculation</h3>
+                <p>Throughout this guide, we'll use a simple example of calculating energy levels for 24Mg in the sd shell as a reference. 24Mg has 12 protons and 12 neutrons, but assuming a 16O core (8 protons, 8 neutrons), we'll work with 4 valence protons and 4 valence neutrons.</p>
             </div>
-
-            <div class="card">
-                <div class="card-header">Upload Your Own Files</div>
-                <div class="form-group">
-                    <label for="uploadSPS">Upload .sps file:</label>
-                    <input type="file" id="uploadSPS" accept=".sps,.sp">
-                    <p class="help-text">Upload your own single-particle space definition file.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="uploadINT">Upload .int file:</label>
-                    <input type="file" id="uploadINT" accept=".int">
-                    <p class="help-text">Upload your own interaction matrix elements file.</p>
-                </div>
-            </div>
-
-            <div class="navigation">
-                <button class="prev-btn" data-prev="introduction">Previous: Introduction</button>
-                <button class="next-btn" data-next="model-space">Next: Define Model Space</button>
+            
+            <div class="section-navigation">
+                <div></div>
+                <button class="next-tab-btn" data-next="model-space">Next: Define Model Space</button>
             </div>
         </div>
 
-        <!-- Model Space Section -->
-        <div id="model-space" class="section">
+        <!-- Model Space Tab -->
+        <div id="model-space" class="tab-section">
             <h2>Define Model Space</h2>
-            <p>The model space is defined by the single-particle orbits, number of valence particles, quantum numbers, and optional truncations.</p>
-
+            <p>The model space defines which nucleons and orbitals are included in your calculation.</p>
+            
             <div class="card">
                 <div class="card-header">Single-Particle Space</div>
                 <div class="form-group">
-                    <label for="spsFileChoice">Select single-particle space file:</label>
+                    <label for="spsFileChoice">Select single-particle space:</label>
                     <select id="spsFileChoice">
-                        <option value="">-- Select an option --</option>
-                        <option value="sd">sd (sd shell)</option>
-                        <option value="pf">pf (pf shell)</option>
-                        <option value="fpd">fpd (fp+d5/2 shell)</option>
-                        <option value="sdpf">sdpf (sd+pf shell)</option>
-                        <option value="auto">auto (Generate automatically for no-core shell model)</option>
-                        <option value="custom">Use uploaded file</option>
+                        <option value="sd">sd shell (0d5/2, 0d3/2, 1s1/2)</option>
+                        <option value="pf">pf shell (0f7/2, 0f5/2, 1p3/2, 1p1/2)</option>
+                        <option value="fpd">fp+d5/2 shell</option>
+                        <option value="sdpf">sd+pf shell</option>
+                        <option value="auto">Auto-generate (for no-core shell model)</option>
                     </select>
                     <div class="help-text">
-                        <p>Choose the single-particle space definition file. The file defines the quantum numbers of each orbit.</p>
-                        <p>Select "auto" for no-core shell model calculations, which will automatically generate the single-particle space.</p>
+                        <p>This defines the single-particle orbits available to your valence nucleons.</p>
+                        <p>For beginners, the "sd shell" is recommended for lighter nuclei (mass numbers around 20-36).</p>
                     </div>
                 </div>
 
@@ -460,40 +309,65 @@
                     <div class="form-group">
                         <label for="maxN">Maximum principal quantum number N:</label>
                         <input type="number" id="maxN" min="0" max="10" value="4">
-                        <p class="help-text">For auto-generated basis, specify the maximum principal quantum number (0 for 0s, 1 for 0p, 2 for 1s0d, etc.)</p>
+                        <p class="help-text">For no-core shell model, specify the maximum orbital quantum number (0 for 0s, 1 for 0p, 2 for sd, etc.)</p>
                     </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">Valence Particles</div>
+                <div class="example-box">
+                    <p><strong>Example:</strong> For 24Mg with an 16O core, we use 4 valence protons and 4 valence neutrons.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nucleus">Common Nuclei:</label>
+                    <select id="nucleus">
+                        <option value="custom">Custom configuration</option>
+                        <option value="mg24" selected>24Mg (sd shell, 4p 4n)</option>
+                        <option value="si28">28Si (sd shell, 6p 6n)</option>
+                        <option value="s32">32S (sd shell, 8p 8n)</option>
+                        <option value="ca40">40Ca (sd shell, 12p 12n)</option>
+                        <option value="ca48">48Ca (pf shell, 0p 8n)</option>
+                        <option value="ti46">46Ti (pf shell, 2p 4n)</option>
+                        <option value="fe56">56Fe (pf shell, 6p 10n)</option>
+                        <option value="ni56">56Ni (pf shell, 8p 8n)</option>
+                    </select>
+                    <p class="help-text">Select a common nucleus to automatically set valence particles, or choose "Custom configuration" to set them manually.</p>
+                </div>
+                
                 <div class="form-group">
                     <label for="valenceProtons">Number of valence protons:</label>
-                    <input type="number" id="valenceProtons" min="0" max="50" value="0">
-                    <div class="help-text tooltip">
-                        How many valence protons? For particle-hole conjugation, enter a negative number.
-                        <span class="tooltiptext">If you enter a negative number, BIGSTICK will use particle-hole conjugation. For example, -2 means 2 proton holes.</span>
+                    <input type="number" id="valenceProtons" min="-20" max="50" value="4">
+                    <div class="help-text">
+                        <p>For standard shell model: Count only valence protons above the core.</p>
+                        <p>For negative values: Will use particle-hole conjugation (advanced option).</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="valenceNeutrons">Number of valence neutrons:</label>
-                    <input type="number" id="valenceNeutrons" min="0" max="50" value="0">
-                    <div class="help-text tooltip">
-                        How many valence neutrons? For particle-hole conjugation, enter a negative number.
-                        <span class="tooltiptext">If you enter a negative number, BIGSTICK will use particle-hole conjugation. For example, -4 means 4 neutron holes.</span>
+                    <input type="number" id="valenceNeutrons" min="-20" max="50" value="4">
+                    <div class="help-text">
+                        <p>For standard shell model: Count only valence neutrons above the core.</p>
+                        <p>For negative values: Will use particle-hole conjugation (advanced option).</p>
                     </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">Quantum Numbers</div>
+                <div class="example-box">
+                    <p><strong>Example:</strong> For even-even nuclei like 24Mg, we typically use 2×Jz = 0 and positive parity.</p>
+                </div>
+                
                 <div class="form-group">
                     <label for="jzValue">2 × Jz value:</label>
                     <input type="number" id="jzValue" min="-20" max="20" step="1" value="0">
-                    <div class="help-text tooltip">
-                        Enter twice the desired Jz value. For even number of particles, usually 0. For odd number, enter an odd integer, typically ±1.
-                        <span class="tooltiptext">BIGSTICK is an M-scheme code, meaning the many-body basis states have fixed total M = Jz. You must enter an integer which is twice the desired value of M. If there are an even number of particles, this is usually 0. For an odd number of nucleons, you must enter an odd integer, typically ±1.</span>
+                    <div class="help-text">
+                        <p>BIGSTICK uses an M-scheme basis with fixed Jz. Enter twice the value of Jz.</p>
+                        <p>For even number of particles: Usually 0</p>
+                        <p>For odd number of particles: Enter an odd integer, typically ±1</p>
                     </div>
                 </div>
 
@@ -511,12 +385,16 @@
                         <input type="radio" id="parityBoth" name="parity" value="0">
                         <label for="parityBoth">Both (0)</label>
                     </div>
-                    <p class="help-text">Select the parity of states. Choose "Both" if you want to compute parity-changing transitions.</p>
+                    <p class="help-text">Select the parity of states to include. Choose "Both" only if you need to compute parity-changing transitions.</p>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">Truncation Options</div>
+                <div class="warning-box">
+                    <p>For beginners, it's recommended to leave truncation off (select "No" below) unless you know your calculation will be too large to handle.</p>
+                </div>
+                
                 <div class="form-group">
                     <label for="truncateOption">Would you like to truncate the many-body space?</label>
                     <div class="radio-group">
@@ -527,9 +405,9 @@
                         <input type="radio" id="truncateNo" name="truncate" value="n" checked>
                         <label for="truncateNo">No</label>
                     </div>
-                    <div class="help-text tooltip">
-                        Truncation reduces the size of the many-body space based on excitation criteria.
-                        <span class="tooltiptext">Truncation allows you to reduce the computational burden by restricting the many-body space. This is useful for large spaces where a full calculation would be intractable. The truncation is based on weight factors (w) assigned to single-particle orbits in the .sps file.</span>
+                    <div class="help-text">
+                        <p>Truncation reduces the computational burden by restricting the many-body space.</p>
+                        <p>Only needed for large calculations that exceed memory limits.</p>
                     </div>
                 </div>
 
@@ -539,217 +417,107 @@
                         <input type="number" id="maxExcite" min="0" max="20" value="2">
                         <p class="help-text">Enter the maximum excitation level allowed. This limits the total W of states.</p>
                     </div>
-
-                    <div class="form-group">
-                        <label for="advancedTruncation">Use advanced truncation options?</label>
-                        <div class="radio-group">
-                            <input type="radio" id="advTruncYes" name="advTrunc" value="y">
-                            <label for="advTruncYes">Yes</label>
-                        </div>
-                        <div class="radio-group">
-                            <input type="radio" id="advTruncNo" name="advTrunc" value="n" checked>
-                            <label for="advTruncNo">No</label>
-                        </div>
-                    </div>
-
-                    <div id="advancedTruncationOptions" style="display: none;">
-                        <div class="form-group">
-                            <label for="maxExciteSum">Maximum excitation for sum:</label>
-                            <input type="number" id="maxExciteSum" min="0" max="20" value="2">
-                            <p class="help-text">Maximum value for Wp + Wn</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="maxExciteProtons">Maximum excitation for protons:</label>
-                            <input type="number" id="maxExciteProtons" min="0" max="20" value="2">
-                            <p class="help-text">Maximum value for proton excitations (Wp)</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="maxExciteNeutrons">Maximum excitation for neutrons:</label>
-                            <input type="number" id="maxExciteNeutrons" min="0" max="20" value="2">
-                            <p class="help-text">Maximum value for neutron excitations (Wn)</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <div class="navigation">
-                <button class="prev-btn" data-prev="prerequisites">Previous: Prerequisites</button>
-                <button class="next-btn" data-next="interaction">Next: Set Interactions</button>
+            <div class="section-navigation">
+                <button class="prev-tab-btn" data-prev="introduction">Previous: Introduction</button>
+                <button class="next-tab-btn" data-next="interactions">Next: Set Interactions</button>
             </div>
         </div>
 
-        <!-- Interaction Section -->
-        <div id="interaction" class="section">
+        <!-- Interactions Tab -->
+        <div id="interactions" class="tab-section">
             <h2>Set Interactions</h2>
-            <p>Define the interaction matrix elements to use in your calculation.</p>
-
+            <p>The interaction defines the nuclear forces between nucleons in your calculation.</p>
+            
+            <div class="example-box">
+                <p><strong>Example:</strong> For 24Mg in the sd shell, we typically use the USDB interaction.</p>
+            </div>
+            
             <div class="card">
                 <div class="card-header">Interaction Files</div>
-                <div id="interactionFiles">
-                    <div class="form-group interaction-input">
-                        <label for="intFile1">Interaction file 1:</label>
-                        <select id="intFile1" class="intFile">
-                            <option value="">-- Select an option --</option>
-                            <option value="usda">usda (USDA interaction for sd shell)</option>
-                            <option value="usdb">usdb (USDB interaction for sd shell)</option>
-                            <option value="gx1a">gx1a (GX1A interaction for pf shell)</option>
-                            <option value="kb3g">kb3g (KB3G interaction for pf shell)</option>
-                            <option value="custom">Use uploaded file</option>
-                        </select>
-                        <div class="help-text tooltip">
-                            Choose the interaction file containing matrix elements.
-                            <span class="tooltiptext">The interaction file contains single-particle energies and two-body matrix elements. Make sure the interaction file is compatible with your chosen single-particle space file.</span>
-                        </div>
-                    </div>
-                </div>
-                <button id="addInteractionBtn">+ Add Another Interaction File</button>
-                <button id="removeInteractionBtn" style="display: none;">- Remove Last Interaction File</button>
-            </div>
-
-            <div class="card">
-                <div class="card-header">Interaction Format</div>
                 <div class="form-group">
-                    <label for="intFormat">Interaction format:</label>
-                    <div class="radio-group">
-                        <input type="radio" id="formatStandard" name="intFormat" value="standard" checked>
-                        <label for="formatStandard">Standard (isospin conserving)</label>
-                    </div>
-                    <div class="radio-group">
-                        <input type="radio" id="formatXPN" name="intFormat" value="xpn">
-                        <label for="formatXPN">Explicit proton-neutron (XPN)</label>
-                    </div>
-                    <div class="radio-group">
-                        <input type="radio" id="formatUPN" name="intFormat" value="upn">
-                        <label for="formatUPN">Unnormalized proton-neutron (UPN, typical for NuShell)</label>
-                    </div>
-                    <div class="radio-group">
-                        <input type="radio" id="formatMFDn" name="intFormat" value="mfdn">
-                        <label for="formatMFDn">MFDn format</label>
-                    </div>
-                    <div class="help-text tooltip">
-                        Select the format of your interaction files.
-                        <span class="tooltiptext">Different formats are used for different types of calculations. Standard format conserves isospin, while XPN and UPN formats explicitly break isospin. MFDn format is used primarily for ab initio calculations. If using NuShellX-distributed files, select UPN.</span>
-                    </div>
-                </div>
-
-                <div id="mfdnOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="mfdnType">MFDn format type:</label>
-                        <div class="radio-group">
-                            <input type="radio" id="mfdnI" name="mfdnType" value="I" checked>
-                            <label for="mfdnI">No isospin breaking (I)</label>
-                        </div>
-                        <div class="radio-group">
-                            <input type="radio" id="mfdnP" name="mfdnType" value="P">
-                            <label for="mfdnP">Explicit proton-neutron formalism (P)</label>
-                        </div>
-                        <div class="radio-group">
-                            <input type="radio" id="mfdnC" name="mfdnType" value="C">
-                            <label for="mfdnC">Isospin breaking only through Coulomb (C)</label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="oscillatorFreq">Oscillator frequency (in MeV):</label>
-                        <input type="number" id="oscillatorFreq" min="1" max="100" step="0.1" value="20.0">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="cmStrength">Center-of-mass strength:</label>
-                        <input type="number" id="cmStrength" min="0" max="100" step="0.1" value="1.0">
+                    <label for="intFile">Select interaction:</label>
+                    <select id="intFile">
+                        <option value="usdb" selected>USDB (USD Brown, for sd shell)</option>
+                        <option value="usda">USDA (USD Alternative, for sd shell)</option>
+                        <option value="gxpf1a">GXPF1A (for pf shell)</option>
+                        <option value="kb3g">KB3G (Kuo-Brown, for pf shell)</option>
+                        <option value="nn3lo">NN3LO (for no-core shell model)</option>
+                    </select>
+                    <div class="help-text">
+                        <p>Select the nuclear interaction appropriate for your chosen model space.</p>
+                        <p>For the sd shell, USDB is a well-established choice.</p>
+                        <p>For the pf shell, GXPF1A and KB3G are commonly used.</p>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Scaling Matrix Elements</div>
+                <div class="card-header">Scaling Parameters</div>
+                <div class="example-box">
+                    <p><strong>Example:</strong> For 24Mg with the USDB interaction (fit to A=18), we use A₀=18, A=24, and exponent 0.3</p>
+                </div>
+                
                 <div class="form-group">
-                    <label for="scaleA">A (numerator):</label>
+                    <label for="scaleA">Single-particle energy scaling (A):</label>
                     <input type="number" id="scaleA" min="0" step="0.1" value="1.0">
+                    <p class="help-text">Usually set to 1.0 (no scaling) for single-particle energies</p>
                 </div>
+                
                 <div class="form-group">
-                    <label for="scaleB">B (denominator):</label>
-                    <input type="number" id="scaleB" min="0" step="0.1" value="1.0">
-                    <p class="help-text">For phenomenological interactions, typically set to reference mass (core A + 2)</p>
+                    <label for="scaleB">Reference mass number (A₀):</label>
+                    <input type="number" id="scaleB" min="0" step="1" value="18">
+                    <p class="help-text">Reference mass number used when the interaction was fit (usually A of core + 2)</p>
+                    <ul>
+                        <li>For sd-shell (USDA/B): Use 18 (16O core + 2)</li>
+                        <li>For pf-shell (GXPF1A, KB3G): Use 42 (40Ca core + 2)</li>
+                        <li>For no scaling: Use same value as target mass</li>
+                    </ul>
                 </div>
+                
                 <div class="form-group">
                     <label for="targetA">Target mass number (A):</label>
-                    <input type="number" id="targetA" min="0" step="1" value="0">
-                    <p class="help-text">A of the nucleus being calculated</p>
+                    <input type="number" id="targetA" min="0" step="1" value="24">
+                    <p class="help-text">Mass number of the nucleus being calculated (protons + neutrons)</p>
                 </div>
+                
                 <div class="form-group">
-                    <label for="scaleX">X (exponent):</label>
+                    <label for="scaleX">Scaling exponent (X):</label>
                     <input type="number" id="scaleX" min="0" max="1" step="0.01" value="0.3">
-                    <p class="help-text">Typically around 0.3 for phenomenological interactions</p>
+                    <p class="help-text">Scaling follows (A₀/A)^X. Typically 0.3 for USD interactions and 0.3-0.5 for KB3/GXPF1.</p>
                 </div>
-                <div class="help-text tooltip">
-                    Scaling follows the formula (A/B)^X. If B or X = 0, scale by A only.
-                    <span class="tooltiptext">Empirical studies with phenomenological interactions have found best agreement with experiment if matrix elements are scaled with mass number A. The standard scaling factor is (Aref/A)^x where Aref is the reference mass number (typically A of the frozen core + 2), A is the mass of the desired nucleus, and x is an exponent, typically around 0.3.</span>
-                </div>
-
-                <div id="pnScalingOptions" style="display: none;">
-                    <h4>Individual Component Scaling</h4>
-                    <p class="help-text">For proton-neutron formalism, you can set individual scaling factors:</p>
-                    <div class="form-group">
-                        <label for="scalePSPE">Proton single-particle energies:</label>
-                        <input type="number" id="scalePSPE" min="0" step="0.1" value="1.0">
-                    </div>
-                    <div class="form-group">
-                        <label for="scaleNSPE">Neutron single-particle energies:</label>
-                        <input type="number" id="scaleNSPE" min="0" step="0.1" value="1.0">
-                    </div>
-                    <div class="form-group">
-                        <label for="scalePPTBME">Proton-proton TBMEs:</label>
-                        <input type="number" id="scalePPTBME" min="0" step="0.1" value="1.0">
-                    </div>
-                    <div class="form-group">
-                        <label for="scaleNNTBME">Neutron-neutron TBMEs:</label>
-                        <input type="number" id="scaleNNTBME" min="0" step="0.1" value="1.0">
-                    </div>
-                    <div class="form-group">
-                        <label for="scalePNTBME">Proton-neutron TBMEs:</label>
-                        <input type="number" id="scalePNTBME" min="0" step="0.1" value="1.0">
-                    </div>
+                
+                <div class="info-box">
+                    <p>Matrix elements will be scaled according to (A₀/A)^X. This compensates for the dependence of effective interactions on mass number.</p>
+                    <p>Set X=0 for no mass-dependent scaling.</p>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">Three-Body Forces</div>
-                <div class="form-group">
-                    <label for="threebodyOpt">Use three-body forces?</label>
-                    <div class="radio-group">
-                        <input type="radio" id="threebodyYes" name="threebody" value="y">
-                        <label for="threebodyYes">Yes</label>
-                    </div>
-                    <div class="radio-group">
-                        <input type="radio" id="threebodyNo" name="threebody" value="n" checked>
-                        <label for="threebodyNo">No</label>
-                    </div>
-                    <div class="warning-box">
-                        <p>Note: Three-body forces are computationally intensive and may be disabled in your version of BIGSTICK. Most users will not need this option.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="navigation">
-                <button class="prev-btn" data-prev="model-space">Previous: Define Model Space</button>
-                <button class="next-btn" data-next="run-options">Next: Run Options</button>
+            <div class="section-navigation">
+                <button class="prev-tab-btn" data-prev="model-space">Previous: Model Space</button>
+                <button class="next-tab-btn" data-next="run-options">Next: Run Options</button>
             </div>
         </div>
 
-        <!-- Run Options Section -->
-        <div id="run-options" class="section">
+        <!-- Run Options Tab -->
+        <div id="run-options" class="tab-section">
             <h2>Run Options</h2>
-            <p>Choose the type of calculation to perform and specify output details.</p>
-
+            <p>Define the type of calculation to perform and output details.</p>
+            
             <div class="card">
-                <div class="card-header">Output File Names</div>
+                <div class="card-header">Output File Name</div>
                 <div class="form-group">
                     <label for="outputName">Output file name prefix:</label>
-                    <input type="text" id="outputName" placeholder="e.g., Si28run1">
-                    <div class="help-text tooltip">
-                        Specify a name for your output files.
-                        <span class="tooltiptext">BIGSTICK will create several files with this prefix, such as [prefix].res (results), [prefix].wfn (wave functions), [prefix].log (log file), etc.</span>
+                    <input type="text" id="outputName" placeholder="e.g., Mg24run1" value="Mg24run1">
+                    <div class="help-text">
+                        <p>BIGSTICK will create several files with this prefix:</p>
+                        <ul>
+                            <li><strong>[prefix].res</strong> - Results file with energies and quantum numbers</li>
+                            <li><strong>[prefix].wfn</strong> - Wave function file (binary)</li>
+                            <li><strong>[prefix].log</strong> - Log file with calculation details</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -759,103 +527,56 @@
                 <div class="form-group">
                     <label for="runType">Select run type:</label>
                     <select id="runType">
-                        <option value="n">Compute spectrum (normal run)</option>
+                        <option value="n" selected>Compute spectrum (normal run)</option>
                         <option value="ns">Compute spectrum (suppress eigenvector write-up)</option>
                         <option value="ne">Compute eigenvalues only</option>
                         <option value="d">Compute spectrum + one-body densities</option>
-                        <option value="dp">Compute spectrum + proton-neutron densities</option>
                         <option value="p">Compute spectrum + single-particle occupations</option>
-                        <option value="ps">Compute single-particle occupations (suppress wfn)</option>
-                        <option value="m">Print modeling information for parallel distribution</option>
-                        <option value="f">Self-consistent mean-field approximation</option>
-                        <option value="c">Compute traces</option>
-                    </select>
-                    <div class="help-text tooltip">
-                        Choose the type of calculation to perform.
-                        <span class="tooltiptext">
-                            <strong>n</strong>: Standard calculation - computes energy spectra, J and T values, and writes wave functions to file.<br>
-                            <strong>ns</strong>: Same as n but doesn't write wave functions to file (saves space).<br>
-                            <strong>ne</strong>: Computes only eigenvalues (faster).<br>
-                            <strong>d</strong>: Computes spectrum and all one-body densities.<br>
-                            <strong>dp</strong>: Computes spectrum and one-body densities in proton-neutron format.<br>
-                            <strong>p</strong>: Computes spectrum and single-particle occupations.<br>
-                            <strong>ps</strong>: Computes single-particle occupations without writing wave functions.<br>
-                            <strong>m</strong>: Models how work would be distributed in a parallel run.<br>
-                            <strong>f</strong>: Uses a mean-field approximation to prepare pivot for Lanczos.<br>
-                            <strong>c</strong>: Computes the trace of the Hamiltonian and H².
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">Secondary Options</div>
-                <p class="help-text">These options use previously generated wave functions. You must have completed a primary run first.</p>
-                <div class="form-group">
-                    <label for="secondaryType">Secondary options:</label>
-                    <select id="secondaryType" disabled>
-                        <option value="none">None (primary run only)</option>
-                        <option value="x">Expectation value of an operator</option>
-                        <option value="o">Apply one-body operator</option>
-                        <option value="oo">Apply one-body operator with enforced orthogonality</option>
-                        <option value="a">Apply scalar Hamiltonian</option>
-                        <option value="s">Strength function</option>
-                        <option value="dx">Compute one-body densities from previous run</option>
-                        <option value="dxm">Compute one-body densities (Mathematica format)</option>
-                        <option value="occ">Compute single-particle occupations from previous run</option>
-                        <option value="v">Overlap of initial states with final states</option>
                     </select>
                     <div class="help-text">
-                        <p>These options require a previous .wfn file. For a first run, leave as "None".</p>
+                        <p><strong>Standard run (n)</strong>: Computes energy spectrum, J and T values, and writes wave functions to file.</p>
+                        <p><strong>Suppress eigenvectors (ns)</strong>: Same as standard, but doesn't write wave functions (saves space).</p>
+                        <p><strong>Eigenvalues only (ne)</strong>: Fastest option, just computes energies.</p>
+                        <p><strong>Densities (d)</strong>: Computes spectrum plus one-body density matrices (for transitions).</p>
+                        <p><strong>Occupations (p)</strong>: Computes spectrum plus single-particle occupations.</p>
                     </div>
                 </div>
-
-                <div id="secondaryOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="wfnFile">Previous .wfn file:</label>
-                        <input type="text" id="wfnFile" placeholder="e.g., Si28run1">
-                        <p class="help-text">Enter the name of a previously generated wave function file (without .wfn extension).</p>
-                    </div>
+                
+                <div class="example-box">
+                    <p><strong>Recommendation for beginners:</strong> Start with a normal run (n) to get the basic energy spectrum.</p>
                 </div>
             </div>
 
-            <div class="navigation">
-                <button class="prev-btn" data-prev="interaction">Previous: Set Interactions</button>
-                <button class="next-btn" data-next="diagonalization">Next: Diagonalization</button>
+            <div class="section-navigation">
+                <button class="prev-tab-btn" data-prev="interactions">Previous: Interactions</button>
+                <button class="next-tab-btn" data-next="diagonalization">Next: Diagonalization</button>
             </div>
         </div>
 
-        <!-- Diagonalization Section -->
-        <div id="diagonalization" class="section">
+        <!-- Diagonalization Tab -->
+        <div id="diagonalization" class="tab-section">
             <h2>Diagonalization Options</h2>
             <p>Set parameters for how BIGSTICK will solve the eigenvalue problem.</p>
-
+            
+            <div class="example-box">
+                <p><strong>Example:</strong> For 24Mg, standard Lanczos with default convergence, keeping 5 states and maximum 150 iterations is usually sufficient.</p>
+            </div>
+            
             <div class="card">
                 <div class="card-header">Diagonalization Method</div>
                 <div class="form-group">
                     <label for="diagMethod">Choose diagonalization method:</label>
                     <select id="diagMethod">
-                        <option value="ld">Lanczos with default convergence (STANDARD)</option>
+                        <option value="ld" selected>Lanczos with default convergence (STANDARD)</option>
                         <option value="lf">Lanczos with fixed iterations</option>
-                        <option value="lc">Lanczos with user-defined convergence</option>
                         <option value="td">Thick-restart Lanczos with default convergence</option>
-                        <option value="tf">Thick-restart Lanczos with fixed iterations</option>
-                        <option value="tc">Thick-restart Lanczos with user-defined convergence</option>
-                        <option value="tx">Thick-restart Lanczos targeting states near specified energy</option>
-                        <option value="ex">Exact and full diagonalization (small dimensions only)</option>
-                        <option value="sk">Skip Lanczos (only for timing set up)</option>
+                        <option value="ex">Exact diagonalization (small dimensions only)</option>
                     </select>
-                    <div class="help-text tooltip">
-                        Select the method to diagonalize the Hamiltonian matrix.
-                        <span class="tooltiptext">
-                            <strong>ld</strong>: Standard Lanczos with default convergence criteria (recommended for most cases).<br>
-                            <strong>lf</strong>: Standard Lanczos with a fixed number of iterations without checking convergence.<br>
-                            <strong>lc</strong>: Standard Lanczos with user-defined convergence criteria.<br>
-                            <strong>td/tf/tc</strong>: Thick-restart Lanczos variants that require less memory but more iterations.<br>
-                            <strong>tx</strong>: Experimental mode for finding highly excited states.<br>
-                            <strong>ex</strong>: Full diagonalization - only use for small dimensions (less than ~10,000).<br>
-                            <strong>sk</strong>: Skip diagonalization (only used for timing set-up).
-                        </span>
+                    <div class="help-text">
+                        <p><strong>Standard Lanczos (ld)</strong>: Recommended for most calculations. Iteratively finds the lowest eigenstates.</p>
+                        <p><strong>Fixed iterations (lf)</strong>: Runs a fixed number of iterations without checking convergence.</p>
+                        <p><strong>Thick-restart (td)</strong>: For very large problems that need less memory.</p>
+                        <p><strong>Exact (ex)</strong>: Only for very small dimensions (less than ~10,000).</p>
                     </div>
                 </div>
             </div>
@@ -863,203 +584,478 @@
             <div class="card">
                 <div class="card-header">Lanczos Parameters</div>
                 <div class="form-group">
-                    <label for="nKeep">Number of states to keep (nKeep):</label>
+                    <label for="nKeep">Number of states to keep:</label>
                     <input type="number" id="nKeep" min="1" max="100" value="5">
-                    <div class="help-text tooltip">
-                        Number of low-lying states to compute and print out.
-                        <span class="tooltiptext">This is the number of converged eigenstates you want. Typical values are 5-10 for ground state plus a few excited states.</span>
+                    <div class="help-text">
+                        <p>Number of low-lying states to compute and print out.</p>
+                        <p>Typical values: 5-10 states for ground state plus a few excited states.</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="maxIter">Maximum number of Lanczos iterations:</label>
                     <input type="number" id="maxIter" min="10" max="1000" value="150">
-                    <div class="help-text tooltip">
-                        Maximum number of Lanczos iterations to perform.
-                        <span class="tooltiptext">For standard Lanczos, this sets an upper limit on iterations. Typical values are 100-300. For phenomenological spaces, the ground state often converges in under 50 iterations, the first 5 states in 100-150 iterations.</span>
-                    </div>
-                </div>
-
-                <div id="thickRestartOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="nThick">Number of vectors to keep after thick-restart (nThick):</label>
-                        <input type="number" id="nThick" min="5" max="100" value="20">
-                        <div class="help-text tooltip">
-                            Number of eigenvectors to keep during restart.
-                            <span class="tooltiptext">This should be between nKeep and maxIter. A typical value is around 3 × nKeep.</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="maxRestarts">Maximum number of restarts:</label>
-                        <input type="number" id="maxRestarts" min="1" max="100" value="10">
-                        <div class="help-text tooltip">
-                            Maximum number of thick-restart cycles to perform.
-                            <span class="tooltiptext">Each restart begins a new Lanczos process using the results from the previous one.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="targetEnergyOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="targetEnergy">Target energy:</label>
-                        <input type="number" id="targetEnergy" step="0.1" value="0.0">
-                        <div class="help-text tooltip">
-                            Energy near which to find states.
-                            <span class="tooltiptext">This experimental mode attempts to find states near the specified energy rather than the lowest states.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="convergenceOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="convType">Convergence criterion type:</label>
-                        <select id="convType">
-                            <option value="0">Average difference in energies</option>
-                            <option value="1">Max difference in energies</option>
-                            <option value="2">Average difference in wavefunctions</option>
-                            <option value="3">Min difference in wavefunctions</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="additionalStates">Additional states for convergence test:</label>
-                        <input type="number" id="additionalStates" min="0" max="20" value="5">
-                        <div class="help-text">Default is 5; can choose 0 for no additional states.</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tolerance">Convergence tolerance:</label>
-                        <input type="number" id="tolerance" min="0.000001" max="0.1" step="0.00001" value="0.00001">
-                        <div class="help-text">Smaller values require tighter convergence (default: 1.0E-5).</div>
+                    <div class="help-text">
+                        <p>Maximum number of Lanczos iterations to perform.</p>
+                        <p>Typical values: 100-300. For sd-shell nuclei, 150 is usually sufficient.</p>
+                        <p>More iterations are needed for:</p>
+                        <ul>
+                            <li>More states (higher nKeep)</li>
+                            <li>Higher precision</li>
+                            <li>Closely spaced energy levels</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">Parallelization Options</div>
-                <div class="form-group">
-                    <label for="useParallel">Use parallel computation?</label>
-                    <div class="radio-group">
-                        <input type="radio" id="parallelYes" name="parallel" value="y">
-                        <label for="parallelYes">Yes</label>
-                    </div>
-                    <div class="radio-group">
-                        <input type="radio" id="parallelNo" name="parallel" value="n" checked>
-                        <label for="parallelNo">No</label>
-                    </div>
-                </div>
-
-                <div id="parallelOptions" style="display: none;">
-                    <div class="form-group">
-                        <label for="numMPI">Number of MPI processes:</label>
-                        <input type="number" id="numMPI" min="1" max="1024" value="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="numOMP">Number of OpenMP threads per process:</label>
-                        <input type="number" id="numOMP" min="1" max="64" value="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="fragmentSize">Fragment size for Lanczos vectors:</label>
-                        <input type="number" id="fragmentSize" min="0" max="1000000000" step="1000000" value="200000000">
-                        <div class="help-text">Enter 0 to use default (200,000,000). Larger fragments are generally more efficient but require more memory per process.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="navigation">
-                <button class="prev-btn" data-prev="run-options">Previous: Run Options</button>
-                <button class="next-btn" data-next="results">Next: Run & Results</button>
+            <div class="section-navigation">
+                <button class="prev-tab-btn" data-prev="run-options">Previous: Run Options</button>
+                <button class="next-tab-btn" data-next="input-file">Next: Generate Input File</button>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div id="results" class="section">
-            <h2>Run & Results</h2>
-
+        <!-- Input File Tab -->
+        <div id="input-file" class="tab-section">
+            <h2>Generate Input File</h2>
+            
             <div class="card">
-                <div class="card-header">Summary of Calculation</div>
-                <div id="calculationSummary">
-                    <p>Here's a summary of your calculation setup:</p>
-                    <ul id="summaryList">
-                        <!-- Filled dynamically -->
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">Command Preview</div>
-                <div class="code-block" id="commandPreview">
+                <div class="card-header">Your BIGSTICK Configuration</div>
+                <p>Review your calculation settings below:</p>
+                <div id="summaryList">
                     <!-- Filled dynamically -->
                 </div>
-                <p class="help-text">This is the equivalent command-line input that would be used for BIGSTICK.</p>
+            </div>
+            
+            <button id="generateInputBtn" class="generate-btn">Generate BIGSTICK Input File</button>
+            
+            <div class="input-preview">
+                <h3>Generated Input File</h3>
+                <p>This is the input file for your BIGSTICK calculation. You can copy or download it to use with BIGSTICK.</p>
+                <div class="code-block" id="generatedInput">
+                    <!-- This will be filled dynamically -->
+                    <p class="help-text">Click the "Generate BIGSTICK Input File" button above to create your input file.</p>
+                </div>
+                
+                <div class="info-box">
+                    <h4>How to use this input file:</h4>
+                    <ol>
+                        <li>Download the input file to your computer</li>
+                        <li>Make sure you have BIGSTICK installed and compiled</li>
+                        <li>Run BIGSTICK with this command:</li>
+                    </ol>
+                    <code>bigstick.x < your_input_file.txt</code>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="copyInputBtn" onclick="copyInputToClipboard()">Copy to Clipboard</button>
+                    <a id="downloadInputBtn" href="#" onclick="downloadInputFile(); return false;" download="bigstick_input.txt">Download Input File</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Line-by-Line Explanation</div>
+                    <div id="explanationBox">
+                        <!-- Filled dynamically -->
+                        <p>Generate the input file to see the explanation.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">Sample Input File</div>
-                <p>Here's a sample input file for BIGSTICK. You can use this file with the command <code>bigstick.x < input_file.txt</code> to run non-interactively.</p>
-                <div class="code-block" id="sampleInput">n
-Mg24run1
-sd
-4 4
-0
-n
-usdb
-1 18 24 0.3
-end
-ld
-5 150
-</div>
-                <p><strong>What each line means:</strong></p>
-                <ul>
-                    <li><code>n</code> - Normal run, computing spectrum and wave functions</li>
-                    <li><code>Mg24run1</code> - Output file name prefix</li>
-                    <li><code>sd</code> - Use the sd shell single-particle space</li>
-                    <li><code>4 4</code> - 4 valence protons, 4 valence neutrons (24Mg has Z=12, N=12, with 16O core)</li>
-                    <li><code>0</code> - 2×Jz = 0 (total angular momentum projection)</li>
-                    <li><code>n</code> - No truncation of the model space</li>
-                    <li><code>usdb</code> - Use the USDB interaction for the sd shell</li>
-                    <li><code>1 18 24 0.3</code> - Scaling factors: SPE scale=1, A₀=18, A=24, exponent=0.3</li>
-                    <li><code>end</code> - End of interaction file input</li>
-                    <li><code>ld</code> - Lanczos with default convergence</li>
-                    <li><code>5 150</code> - Keep 5 states, maximum 150 Lanczos iterations</li>
-                    <li>(empty line at the end)</li>
-                </ul>
-                <button id="copyInputBtn" onclick="copyInputToClipboard()">Copy Input to Clipboard</button>
-                <a id="downloadInputBtn" href="#" onclick="downloadInputFile()" download="bigstick_input.txt">Download Input File</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">Post-Processing Options</div>
-                <p>After completing a calculation, you can perform various post-processing operations:</p>
-                <ul>
-                    <li>Compute expectation values of scalar operators</li>
-                    <li>Apply one-body transition operators</li>
-                    <li>Generate transition strength function distributions</li>
-                    <li>Calculate wave function overlaps</li>
-                    <li>Extract one-body density matrices for transitions</li>
-                </ul>
-                <p>These options require previous wave function files (.wfn) and can be accessed by returning to the "Run Options" section and selecting a secondary option.</p>
-            </div>
-
-            <div class="navigation">
-                <button class="prev-btn" data-prev="diagonalization">Previous: Diagonalization</button>
-                <button id="resetBtn">Start New Calculation</button>
+            <div class="section-navigation">
+                <button class="prev-tab-btn" data-prev="diagonalization">Previous: Diagonalization</button>
             </div>
         </div>
-        
-        <footer style="text-align: center; margin-top: 50px; padding: 20px; background-color: #f5f5f5; border-top: 1px solid #ddd;">
+
+        <footer>
             <p>Designed and made by <a href="http://jinlei.fewbody.com/">Jin Lei</a>. Supported by the National Natural Science Foundation of China (Grants No. 12475132). If you find any bugs or errors related to this website, please <a href="mailto:jinl@tongji.edu.cn">email me</a>.</p>
         </footer>
     </div>
 
     <script>
+        // Tab navigation
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Hide all tab sections
+                document.querySelectorAll('.tab-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show selected tab section
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update active button
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Next/Previous tab navigation
+        document.querySelectorAll('.next-tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const nextTabId = this.getAttribute('data-next');
+                document.querySelector(`.tab-button[data-tab="${nextTabId}"]`).click();
+            });
+        });
+        
+        document.querySelectorAll('.prev-tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const prevTabId = this.getAttribute('data-prev');
+                document.querySelector(`.tab-button[data-tab="${prevTabId}"]`).click();
+            });
+        });
+        
+        // Show/hide auto options
+        document.getElementById('spsFileChoice').addEventListener('change', function() {
+            if (this.value === 'auto') {
+                document.getElementById('autoOptions').style.display = 'block';
+            } else {
+                document.getElementById('autoOptions').style.display = 'none';
+            }
+        });
+        
+        // Show/hide truncation options
+        document.querySelectorAll('input[name="truncate"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.value === 'y') {
+                    document.getElementById('truncationOptions').style.display = 'block';
+                } else {
+                    document.getElementById('truncationOptions').style.display = 'none';
+                }
+            });
+        });
+        
+        // Handle pre-defined nuclei selection
+        document.getElementById('nucleus').addEventListener('change', function() {
+            if (this.value === 'custom') {
+                return; // Let user set custom values
+            }
+            
+            // Set values based on selected nucleus
+            const nucleiData = {
+                'mg24': { sps: 'sd', protons: 4, neutrons: 4, jz: 0, parity: '+', int: 'usdb', a0: 18, a: 24 },
+                'si28': { sps: 'sd', protons: 6, neutrons: 6, jz: 0, parity: '+', int: 'usdb', a0: 18, a: 28 },
+                's32': { sps: 'sd', protons: 8, neutrons: 8, jz: 0, parity: '+', int: 'usdb', a0: 18, a: 32 },
+                'ca40': { sps: 'sd', protons: 12, neutrons: 12, jz: 0, parity: '+', int: 'usdb', a0: 18, a: 40 },
+                'ca48': { sps: 'pf', protons: 0, neutrons: 8, jz: 0, parity: '+', int: 'gxpf1a', a0: 42, a: 48 },
+                'ti46': { sps: 'pf', protons: 2, neutrons: 4, jz: 0, parity: '+', int: 'gxpf1a', a0: 42, a: 46 },
+                'fe56': { sps: 'pf', protons: 6, neutrons: 10, jz: 0, parity: '+', int: 'gxpf1a', a0: 42, a: 56 },
+                'ni56': { sps: 'pf', protons: 8, neutrons: 8, jz: 0, parity: '+', int: 'kb3g', a0: 42, a: 56 }
+            };
+            
+            const data = nucleiData[this.value];
+            
+            // Set values in form
+            document.getElementById('spsFileChoice').value = data.sps;
+            document.getElementById('valenceProtons').value = data.protons;
+            document.getElementById('valenceNeutrons').value = data.neutrons;
+            document.getElementById('jzValue').value = data.jz;
+            document.getElementById('intFile').value = data.int;
+            document.getElementById('scaleB').value = data.a0;
+            document.getElementById('targetA').value = data.a;
+            document.getElementById('outputName').value = this.value + 'run1';
+            
+            // Set parity
+            document.querySelectorAll('input[name="parity"]').forEach(radio => {
+                if (radio.value === data.parity) {
+                    radio.checked = true;
+                }
+            });
+        });
+        
+        // Function to generate a summary of settings
+        function updateSummary() {
+            const summaryList = document.getElementById('summaryList');
+            
+            // Model Space
+            const spsFile = document.getElementById('spsFileChoice').value;
+            const spsText = document.getElementById('spsFileChoice').options[document.getElementById('spsFileChoice').selectedIndex].text;
+            const valenceP = document.getElementById('valenceProtons').value;
+            const valenceN = document.getElementById('valenceNeutrons').value;
+            const jzVal = document.getElementById('jzValue').value;
+            
+            // Get parity
+            const parityOptions = document.querySelectorAll('input[name="parity"]');
+            let parity = "+";
+            for (const option of parityOptions) {
+                if (option.checked) {
+                    parity = option.value;
+                    break;
+                }
+            }
+            
+            // Interaction
+            const intFile = document.getElementById('intFile').value;
+            const intText = document.getElementById('intFile').options[document.getElementById('intFile').selectedIndex].text;
+            
+            // Run type
+            const runType = document.getElementById('runType').value;
+            const runTypeText = document.getElementById('runType').options[document.getElementById('runType').selectedIndex].text;
+            
+            // Diagonalization
+            const diagMethod = document.getElementById('diagMethod').value;
+            const diagMethodText = document.getElementById('diagMethod').options[document.getElementById('diagMethod').selectedIndex].text;
+            const nKeep = document.getElementById('nKeep').value;
+            const maxIter = document.getElementById('maxIter').value;
+            
+            // Build HTML
+            let summaryHTML = `
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Setting</th>
+                        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Value</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Single-particle space</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${spsText}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Valence particles</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${valenceP} protons, ${valenceN} neutrons</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">2 × Jz</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${jzVal}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Parity</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${parity}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Interaction</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${intText}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Run type</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${runTypeText}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Diagonalization</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${diagMethodText}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">States to keep</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${nKeep}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Max iterations</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${maxIter}</td>
+                    </tr>
+                </table>
+            `;
+            
+            summaryList.innerHTML = summaryHTML;
+        }
+        
+        // Function to generate input file based on current settings
+        function generateInputFile() {
+            // Get values from form fields
+            const runType = document.getElementById('runType').value;
+            const outputName = document.getElementById('outputName').value || "bigstick_output";
+            const spsFile = document.getElementById('spsFileChoice').value;
+            
+            // Handle auto option for NCSM
+            let spsFileValue = spsFile;
+            if (spsFile === 'auto') {
+                const maxN = document.getElementById('maxN').value;
+                spsFileValue = `auto\n${maxN}`;
+            }
+            
+            const valenceP = document.getElementById('valenceProtons').value;
+            const valenceN = document.getElementById('valenceNeutrons').value;
+            const jzVal = document.getElementById('jzValue').value;
+            
+            // Get parity
+            const parityOptions = document.querySelectorAll('input[name="parity"]');
+            let parity = "+";
+            for (const option of parityOptions) {
+                if (option.checked) {
+                    parity = option.value;
+                    break;
+                }
+            }
+            
+            // Get truncation settings
+            const truncateOptions = document.querySelectorAll('input[name="truncate"]');
+            let truncate = "n";
+            for (const option of truncateOptions) {
+                if (option.checked) {
+                    truncate = option.value;
+                    break;
+                }
+            }
+            
+            // Get interaction file
+            const intFile = document.getElementById('intFile').value;
+            
+            // Get scaling values
+            const scaleA = document.getElementById('scaleA').value;
+            const scaleB = document.getElementById('scaleB').value;
+            const targetA = document.getElementById('targetA').value;
+            const scaleX = document.getElementById('scaleX').value;
+            
+            // Get diagonalization settings
+            const diagMethod = document.getElementById('diagMethod').value;
+            const nKeep = document.getElementById('nKeep').value;
+            const maxIter = document.getElementById('maxIter').value;
+            
+            // Construct input file
+            let inputFile = `${runType}\n${outputName}\n${spsFileValue}\n${valenceP} ${valenceN}\n${jzVal}\n`;
+            
+            // Add parity if needed (not for sd shell which is all positive)
+            if (spsFile !== 'sd') {
+                inputFile += `${parity}\n`;
+            }
+            
+            // Add truncation info
+            inputFile += `${truncate}\n`;
+            if (truncate === 'y') {
+                const maxExcite = document.getElementById('maxExcite').value;
+                inputFile += `${maxExcite}\n`;
+            }
+            
+            // Add interaction files
+            inputFile += `${intFile}\n`;
+            
+            // Add scaling
+            inputFile += `${scaleA} ${scaleB} ${targetA} ${scaleX}\n`;
+            
+            // Add end of interaction marker
+            inputFile += "end\n";
+            
+            // Add diagonalization method
+            inputFile += `${diagMethod}\n${nKeep} ${maxIter}\n`;
+            
+            // Add final blank line
+            inputFile += "\n";
+            
+            return inputFile;
+        }
+        
+        // Generate line-by-line explanation
+        function generateExplanation() {
+            const runType = document.getElementById('runType').value;
+            const outputName = document.getElementById('outputName').value || "bigstick_output";
+            const spsFile = document.getElementById('spsFileChoice').value;
+            const valenceP = document.getElementById('valenceProtons').value;
+            const valenceN = document.getElementById('valenceNeutrons').value;
+            const jzVal = document.getElementById('jzValue').value;
+            const intFile = document.getElementById('intFile').value;
+            const scaleA = document.getElementById('scaleA').value;
+            const scaleB = document.getElementById('scaleB').value;
+            const targetA = document.getElementById('targetA').value;
+            const scaleX = document.getElementById('scaleX').value;
+            const diagMethod = document.getElementById('diagMethod').value;
+            const nKeep = document.getElementById('nKeep').value;
+            const maxIter = document.getElementById('maxIter').value;
+            
+            // Get run type explanation
+            let runTypeExplanation = "";
+            switch(runType) {
+                case 'n': runTypeExplanation = "Normal run, computing spectrum and wave functions"; break;
+                case 'ns': runTypeExplanation = "Compute spectrum (suppress eigenvector write-up)"; break;
+                case 'ne': runTypeExplanation = "Compute eigenvalues only"; break;
+                case 'd': runTypeExplanation = "Compute spectrum + all one-body densities"; break;
+                case 'p': runTypeExplanation = "Compute spectrum + single-particle occupations"; break;
+                default: runTypeExplanation = "Run type code";
+            }
+            
+            // Get diagonalization explanation
+            let diagExplanation = "";
+            switch(diagMethod) {
+                case 'ld': diagExplanation = "Lanczos with default convergence"; break;
+                case 'lf': diagExplanation = "Lanczos with fixed iterations"; break;
+                case 'td': diagExplanation = "Thick-restart Lanczos with default convergence"; break;
+                case 'ex': diagExplanation = "Exact and full diagonalization"; break;
+                default: diagExplanation = "Diagonalization method";
+            }
+            
+            let explanation = `
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Line</th>
+                        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Value</th>
+                        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Explanation</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">1</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${runType}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${runTypeExplanation}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">2</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${outputName}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Output file name prefix</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">3</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${spsFile}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Single-particle space file/definition</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">4</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${valenceP} ${valenceN}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Number of valence protons and neutrons</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">5</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${jzVal}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">2 × Jz value</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">6</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>n</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">No truncation (or "y" for truncation)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">7</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${intFile}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Interaction file</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">8</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${scaleA} ${scaleB} ${targetA} ${scaleX}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Scaling parameters: SPEs, A₀, A, exponent</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">9</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>end</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">End of interaction file input</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">10</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${diagMethod}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">${diagExplanation}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">11</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>${nKeep} ${maxIter}</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Number of states to keep, maximum iterations</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">12</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><code>(empty line)</code></td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Required blank line at end of input file</td>
+                    </tr>
+                </table>
+            `;
+            
+            return explanation;
+        }
+        
+        // Function to update displayed input file and explanation
+        function updateInputDisplay() {
+            const inputText = generateInputFile();
+            document.getElementById('generatedInput').innerHTML = inputText.trim(); // Trim to not show the trailing newline
+            document.getElementById('explanationBox').innerHTML = generateExplanation();
+        }
+        
         // Function to copy input to clipboard
         function copyInputToClipboard() {
-            const inputText = document.getElementById('sampleInput').innerText;
-            navigator.clipboard.writeText(inputText + "\n")
+            const inputText = generateInputFile();
+            navigator.clipboard.writeText(inputText)
                 .then(() => {
                     alert("Input file copied to clipboard!");
                 })
@@ -1071,9 +1067,9 @@ ld
         
         // Function to download input file
         function downloadInputFile() {
-            const inputText = document.getElementById('sampleInput').innerText;
+            const inputText = generateInputFile();
             const element = document.createElement('a');
-            const file = new Blob([inputText + "\n"], {type: 'text/plain'});
+            const file = new Blob([inputText], {type: 'text/plain'});
             element.href = URL.createObjectURL(file);
             element.download = "bigstick_input.txt";
             document.body.appendChild(element);
@@ -1081,368 +1077,25 @@ ld
             document.body.removeChild(element);
         }
         
-        // Navigate between sections
-        document.querySelectorAll('.workflow-step').forEach(step => {
-            step.addEventListener('click', function() {
-                const sectionId = this.getAttribute('data-section');
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(sectionId).classList.add('active');
-                
-                document.querySelectorAll('.workflow-step').forEach(s => {
-                    s.classList.remove('active');
-                });
-                this.classList.add('active');
-            });
-        });
-
-        // Next and Previous navigation
-        document.querySelectorAll('.next-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const nextSection = this.getAttribute('data-next');
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(nextSection).classList.add('active');
-                
-                document.querySelectorAll('.workflow-step').forEach(step => {
-                    step.classList.remove('active');
-                    if (step.getAttribute('data-section') === nextSection) {
-                        step.classList.add('active');
-                    }
-                });
-            });
-        });
-
-        document.querySelectorAll('.prev-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const prevSection = this.getAttribute('data-prev');
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(prevSection).classList.add('active');
-                
-                document.querySelectorAll('.workflow-step').forEach(step => {
-                    step.classList.remove('active');
-                    if (step.getAttribute('data-section') === prevSection) {
-                        step.classList.add('active');
-                    }
-                });
-            });
-        });
-
-        // Toggle AutoOptions visibility
-        document.getElementById('spsFileChoice').addEventListener('change', function() {
-            if (this.value === 'auto') {
-                document.getElementById('autoOptions').style.display = 'block';
-            } else {
-                document.getElementById('autoOptions').style.display = 'none';
-            }
-        });
-
-        // Toggle Truncation Options visibility
-        document.querySelectorAll('input[name="truncate"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.value === 'y') {
-                    document.getElementById('truncationOptions').style.display = 'block';
-                } else {
-                    document.getElementById('truncationOptions').style.display = 'none';
-                }
-            });
-        });
-
-        // Toggle Advanced Truncation Options visibility
-        document.querySelectorAll('input[name="advTrunc"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.value === 'y') {
-                    document.getElementById('advancedTruncationOptions').style.display = 'block';
-                } else {
-                    document.getElementById('advancedTruncationOptions').style.display = 'none';
-                }
-            });
-        });
-
-        // Toggle MFDn options visibility
-        document.querySelectorAll('input[name="intFormat"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.value === 'mfdn') {
-                    document.getElementById('mfdnOptions').style.display = 'block';
-                } else {
-                    document.getElementById('mfdnOptions').style.display = 'none';
-                }
-
-                if (this.value === 'xpn' || this.value === 'upn') {
-                    document.getElementById('pnScalingOptions').style.display = 'block';
-                } else {
-                    document.getElementById('pnScalingOptions').style.display = 'none';
-                }
-            });
-        });
-
-        // Toggle Secondary Options visibility
-        document.getElementById('secondaryType').addEventListener('change', function() {
-            if (this.value !== 'none') {
-                document.getElementById('secondaryOptions').style.display = 'block';
-            } else {
-                document.getElementById('secondaryOptions').style.display = 'none';
-            }
-        });
-
-        // Add/Remove Interaction Files
-        document.getElementById('addInteractionBtn').addEventListener('click', function() {
-            const intFileCount = document.querySelectorAll('.interaction-input').length;
-            if (intFileCount < 5) { // Limit to 5 files for simplicity
-                const newInput = document.createElement('div');
-                newInput.className = 'form-group interaction-input';
-                newInput.innerHTML = `
-                    <label for="intFile${intFileCount + 1}">Interaction file ${intFileCount + 1}:</label>
-                    <select id="intFile${intFileCount + 1}" class="intFile">
-                        <option value="">-- Select an option --</option>
-                        <option value="usda">usda (USDA interaction for sd shell)</option>
-                        <option value="usdb">usdb (USDB interaction for sd shell)</option>
-                        <option value="gx1a">gx1a (GX1A interaction for pf shell)</option>
-                        <option value="kb3g">kb3g (KB3G interaction for pf shell)</option>
-                        <option value="custom">Use uploaded file</option>
-                    </select>
-                `;
-                document.getElementById('interactionFiles').appendChild(newInput);
-                document.getElementById('removeInteractionBtn').style.display = 'inline-block';
-            }
-            if (document.querySelectorAll('.interaction-input').length >= 5) {
-                this.style.display = 'none';
-            }
-        });
-
-        document.getElementById('removeInteractionBtn').addEventListener('click', function() {
-            const intFiles = document.querySelectorAll('.interaction-input');
-            if (intFiles.length > 1) {
-                document.getElementById('interactionFiles').removeChild(intFiles[intFiles.length - 1]);
-                document.getElementById('addInteractionBtn').style.display = 'inline-block';
-            }
-            if (document.querySelectorAll('.interaction-input').length <= 1) {
-                this.style.display = 'none';
-            }
-        });
-
-        // Toggle Diagonalization Method Options
-        document.getElementById('diagMethod').addEventListener('change', function() {
-            // Hide all specialized options first
-            document.getElementById('thickRestartOptions').style.display = 'none';
-            document.getElementById('targetEnergyOptions').style.display = 'none';
-            document.getElementById('convergenceOptions').style.display = 'none';
-
-            // Show relevant options based on selection
-            if (this.value.startsWith('t')) { // Any thick-restart option
-                document.getElementById('thickRestartOptions').style.display = 'block';
-            }
-            if (this.value === 'tx') {
-                document.getElementById('targetEnergyOptions').style.display = 'block';
-            }
-            if (this.value === 'lc' || this.value === 'tc') {
-                document.getElementById('convergenceOptions').style.display = 'block';
-            }
-        });
-
-        // Toggle Parallel Options
-        document.querySelectorAll('input[name="parallel"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.value === 'y') {
-                    document.getElementById('parallelOptions').style.display = 'block';
-                } else {
-                    document.getElementById('parallelOptions').style.display = 'none';
-                }
-            });
-        });
-
-        // Tab functionality for results
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        // Generate summary on the results page
-        function updateSummary() {
-            const summaryList = document.getElementById('summaryList');
-            summaryList.innerHTML = '';
-            
-            // Model Space
-            const spsFile = document.getElementById('spsFileChoice').value;
-            const valenceP = document.getElementById('valenceProtons').value;
-            const valenceN = document.getElementById('valenceNeutrons').value;
-            const jzVal = document.getElementById('jzValue').value;
-            
-            let listItems = [
-                `<li>Single-particle space: ${spsFile}</li>`,
-                `<li>Valence particles: ${valenceP} protons, ${valenceN} neutrons</li>`,
-                `<li>2 × Jz: ${jzVal}</li>`
-            ];
-            
-            // Interaction
-            const intFile = document.getElementById('intFile1').value;
-            listItems.push(`<li>Interaction file: ${intFile}</li>`);
-            
-            // Run Type
-            const runType = document.getElementById('runType').value;
-            const runTypeText = document.getElementById('runType').options[document.getElementById('runType').selectedIndex].text;
-            listItems.push(`<li>Run type: ${runTypeText}</li>`);
-            
-            // Diagonalization
-            const diagMethod = document.getElementById('diagMethod').value;
-            const diagMethodText = document.getElementById('diagMethod').options[document.getElementById('diagMethod').selectedIndex].text;
-            const nKeep = document.getElementById('nKeep').value;
-            const maxIter = document.getElementById('maxIter').value;
-            listItems.push(`<li>Diagonalization: ${diagMethodText}</li>`);
-            listItems.push(`<li>States to keep: ${nKeep}</li>`);
-            listItems.push(`<li>Max iterations: ${maxIter}</li>`);
-            
-            summaryList.innerHTML = listItems.join('');
-            
-            // Update command preview
-            updateCommandPreview();
-        }
-
-        function updateCommandPreview() {
-            const commandPreview = document.getElementById('commandPreview');
-            const spsFile = document.getElementById('spsFileChoice').value;
-            const valenceP = document.getElementById('valenceProtons').value;
-            const valenceN = document.getElementById('valenceNeutrons').value;
-            const jzVal = document.getElementById('jzValue').value;
-            const runType = document.getElementById('runType').value;
-            const outputName = document.getElementById('outputName').value || "output";
-            const nKeep = document.getElementById('nKeep').value;
-            const maxIter = document.getElementById('maxIter').value;
-            
-            let command = `PROMPT> bigstick.x
-${runType}
-${outputName}
-${spsFile}
-${valenceP} ${valenceN}
-${jzVal}
-`;
-            
-            // Add truncation if selected
-            if (document.getElementById('truncateYes').checked) {
-                const maxExcite = document.getElementById('maxExcite').value;
-                command += `y\n${maxExcite}\n`;
-            } else {
-                command += `n\n`;
-            }
-            
-            // Add interaction file
-            const intFile = document.getElementById('intFile1').value;
-            command += `${intFile}\n`;
-            
-            // Add scaling
-            const scaleA = document.getElementById('scaleA').value;
-            const scaleB = document.getElementById('scaleB').value;
-            const scaleX = document.getElementById('scaleX').value;
-            command += `${scaleA} ${scaleB} ${document.getElementById('targetA').value} ${scaleX}\nend\n`;
-            
-            // Add diagonalization method
-            const diagMethod = document.getElementById('diagMethod').value;
-            command += `${diagMethod}\n${nKeep} ${maxIter}\n`;
-            
-            commandPreview.textContent = command;
-        }
-
-        // Simulate running the calculation
-        document.getElementById('runCalculation').addEventListener('click', function() {
+        // Generate input file button
+        document.getElementById('generateInputBtn').addEventListener('click', function() {
             updateSummary();
-            document.querySelector('.loading').style.display = 'block';
-            
-            // Simulate calculation delay
-            setTimeout(function() {
-                document.querySelector('.loading').style.display = 'none';
-                document.getElementById('resultsOutput').style.display = 'block';
-                
-                // Generate density output if option selected
-                if (document.getElementById('runType').value.startsWith('d')) {
-                    document.getElementById('densityOutput').innerHTML = `Initial state # 1 E = -87.10445 2xJ, 2xT = 0 0
-Final state # 1 E = -87.10445 2xJ, 2xT = 0 0
-Jt = 0, Tt = 0 1
-1 1 0.84730 0.28105
-2 2 8.32846 2.85633
-3 3 1.52286 0.13245`;
-                } else {
-                    document.getElementById('densityOutput').innerHTML = "No density matrices computed in this run.";
-                }
-            }, 3000);
+            updateInputDisplay();
         });
-
-        // Reset calculation
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            // Reset all form fields
-            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-                if (input.id === 'nKeep') input.value = '5';
-                else if (input.id === 'maxIter') input.value = '150';
-                else if (input.id === 'scaleA') input.value = '1.0';
-                else if (input.id === 'scaleB') input.value = '1.0';
-                else if (input.id === 'scaleX') input.value = '0.3';
-                else input.value = '';
-            });
-            
-            document.querySelectorAll('select').forEach(select => {
-                select.selectedIndex = 0;
-            });
-            
-            document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                if (radio.id === 'truncateNo' || radio.id === 'advTruncNo' || 
-                    radio.id === 'formatStandard' || radio.id === 'threebodyNo' ||
-                    radio.id === 'parallelNo' || radio.id === 'parityPlus') {
-                    radio.checked = true;
-                } else {
-                    radio.checked = false;
-                }
-            });
-            
-            // Reset all dynamic displays
-            document.getElementById('autoOptions').style.display = 'none';
-            document.getElementById('truncationOptions').style.display = 'none';
-            document.getElementById('advancedTruncationOptions').style.display = 'none';
-            document.getElementById('mfdnOptions').style.display = 'none';
-            document.getElementById('pnScalingOptions').style.display = 'none';
-            document.getElementById('secondaryOptions').style.display = 'none';
-            document.getElementById('thickRestartOptions').style.display = 'none';
-            document.getElementById('targetEnergyOptions').style.display = 'none';
-            document.getElementById('convergenceOptions').style.display = 'none';
-            document.getElementById('parallelOptions').style.display = 'none';
-            
-            // Reset results display
-            document.getElementById('resultsOutput').style.display = 'none';
-            document.querySelector('.loading').style.display = 'none';
-            
-            // Navigate back to introduction
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById('introduction').classList.add('active');
-            
-            document.querySelectorAll('.workflow-step').forEach(step => {
-                step.classList.remove('active');
-                if (step.getAttribute('data-section') === 'introduction') {
-                    step.classList.add('active');
-                }
-            });
-        });
-
-        // Initialize by updating summary on page load
+        
+        // Initialize interface with default values for 24Mg
         window.onload = function() {
-            // Make tabs work
-            document.querySelectorAll('.tablinks').forEach(tab => {
-                tab.addEventListener('click', function(event) {
-                    openTab(event, this.getAttribute('onclick').split("'")[1]);
-                });
-            });
+            // Set initial values for 24Mg example
+            document.getElementById('spsFileChoice').value = 'sd';
+            document.getElementById('valenceProtons').value = '4';
+            document.getElementById('valenceNeutrons').value = '4';
+            document.getElementById('jzValue').value = '0';
+            document.getElementById('intFile').value = 'usdb';
+            document.getElementById('scaleA').value = '1.0';
+            document.getElementById('scaleB').value = '18';
+            document.getElementById('targetA').value = '24';
+            document.getElementById('scaleX').value = '0.3';
+            document.getElementById('outputName').value = 'Mg24run1';
         };
     </script>
 </body>
